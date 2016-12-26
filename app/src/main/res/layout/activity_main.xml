@@ -5,22 +5,110 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="15dp"
+    android:background="@color/grey"
     tools:context="com.skyrien.soundremote.MainActivity"
     tools:deviceIds="wear">
 
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/headerText"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_world"
-        app:layout_box="all" />
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textStyle="bold"
+        android:padding="1dp"
+        android:gravity="center"
+        app:layout_box="left|right" />
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_box="left|top|right">
+
 
     <TextView
-        android:id="@+id/clock"
-        android:layout_width="wrap_content"
+        android:id="@+id/titleText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:textColor="@android:color/white"
+        android:text="@string/titleText"
+        android:textStyle="bold"
+        android:padding="1dp"
+        android:gravity="center"
         app:layout_box="all" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="1dp">
+
+        <ImageButton
+            android:id="@+id/sound1_img"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/close_button"/>
+
+        <TextView
+            android:id="@+id/sound1_txt"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/sound1_txt"
+            android:padding="5dp"
+            app:layout_box="all" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="1dp">
+
+        <ImageButton
+            android:id="@+id/sound2_img"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/close_button"/>
+
+        <TextView
+            android:id="@+id/sound2_txt"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/sound2_txt"
+            android:padding="5dp"
+            app:layout_box="all" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="1dp">
+
+        <ImageButton
+            android:id="@+id/sound3_img"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/close_button"/>
+
+        <TextView
+            android:id="@+id/sound3_txt"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/sound3_txt"
+            android:padding="5dp"
+            app:layout_box="all" />
+
+
+    </LinearLayout>
+
+</LinearLayout>
+
+
 
 </android.support.wearable.view.BoxInsetLayout>
