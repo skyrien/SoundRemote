@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SoundRemote.iml" filepath="$PROJECT_DIR$/SoundRemote.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/soundremote-phone/soundremote-phone.iml" filepath="$PROJECT_DIR$/soundremote-phone/soundremote-phone.iml" />
+      <module fileurl="file://$PROJECT_DIR$/soundremote-watch/soundremote-watch.iml" filepath="$PROJECT_DIR$/soundremote-watch/soundremote-watch.iml" />
     </modules>
   </component>
 </project>

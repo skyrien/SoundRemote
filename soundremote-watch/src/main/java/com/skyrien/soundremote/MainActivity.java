@@ -6,6 +6,7 @@ import android.support.wearable.view.BoxInsetLayout;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,7 +42,37 @@ public class MainActivity extends WearableActivity {
         mText2 = (TextView) findViewById(R.id.sound2_txt);
         mText3 = (TextView) findViewById(R.id.sound3_txt);
         mTitleText = (TextView) findViewById(R.id.titleText);
+
+
+
+        // Set up listeners for buttons
+        mImageButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Button 1 pressed!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mImageButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Button 2 pressed!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mImageButton3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Button 3 pressed!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
     }
+
+
 
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
