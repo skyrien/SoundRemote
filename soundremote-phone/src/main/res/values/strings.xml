@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">SoundRemote</string>
+    <string name="sound1_txt">Sound 1</string>
+    <string name="sound2_txt">Sound 2</string>
+    <string name="sound3_txt">Sound 3</string>
+    <string name="sound1_path">Path/Sound1</string>
+    <string name="sound2_path">Path/Sound2</string>
+    <string name="sound3_path">Path/Sound3</string>
 </resources>
