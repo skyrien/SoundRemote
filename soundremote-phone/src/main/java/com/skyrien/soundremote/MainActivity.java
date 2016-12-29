@@ -56,18 +56,21 @@ public class MainActivity extends AppCompatActivity {
         mSound1Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG, "Sound button 1 pressed");
                 playSoundId(soundId1);
             }
         });
         mSound2Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG, "Sound button 2 pressed");
                 playSoundId(soundId2);
             }
         });
         mSound3Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG, "Sound button 3 pressed");
                 playSoundId(soundId3);
             }
         });

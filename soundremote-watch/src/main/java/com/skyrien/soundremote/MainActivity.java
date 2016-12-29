@@ -1,21 +1,33 @@
 package com.skyrien.soundremote;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.CapabilityApi;
+import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.Wearable;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 public class MainActivity extends WearableActivity {
 
-    private static final SimpleDateFormat AMBIENT_DATE_FORMAT =
-            new SimpleDateFormat("HH:mm", Locale.US);
+    private static final String TAG = "MainActivity";
+    private GoogleApiClient mGoogleApiClient;
+    private String playerNodeId;
 
     private BoxInsetLayout mContainerView;
     private ImageButton mImageButton1;
@@ -31,6 +43,7 @@ public class MainActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
+        Log.d(TAG, "onCreate() called");
 
         // For V1, we'll include 3 variable sounds, though the layout is hardcoded.
         // For V2, we'll try to genericize this into a ListView
@@ -43,7 +56,23 @@ public class MainActivity extends WearableActivity {
         mText3 = (TextView) findViewById(R.id.sound3_txt);
         mTitleText = (TextView) findViewById(R.id.titleText);
 
+        // Now, figure out if there's a suitable player for this watch
+        CapabilityApi.GetCapabilityResult result =
+                Wearable.CapabilityApi.getCapability(mGoogleApiClient, "soundremoteplayer",
+                        CapabilityApi.FILTER_REACHABLE).await();
+        updateSoundRemoteCapability(result.getCapability());
 
+
+        // Set up a capability listener
+        CapabilityApi.CapabilityListener capabilityListener =
+                new CapabilityApi.CapabilityListener() {
+                    @Override
+                    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
+                        updateSoundRemoteCapability(capabilityInfo);
+                    }
+                };
+        Wearable.CapabilityApi.addCapabilityListener(mGoogleApiClient,
+                                                        capabilityListener, "soundremoteplayer");
 
         // Set up listeners for buttons
         mImageButton1.setOnClickListener(new View.OnClickListener() {
@@ -67,12 +96,44 @@ public class MainActivity extends WearableActivity {
             }
         });
 
-
-
-
     }
 
+    private void updateSoundRemoteCapability(CapabilityInfo capabilityInfo) {
+        Log.d(TAG, "updateSoundRemoteCapability() called");
+        Set<Node> connectedNodes = capabilityInfo.getNodes();
+        playerNodeId = pickBestNodeId(connectedNodes);
+    }
 
+    private String pickBestNodeId(Set<Node> nodes) {
+        Log.d(TAG, "pickBestNodeId() called");
+        String bestNodeId = null;
+        for (Node node : nodes) {
+            if (node.isNearby()) {
+                return node.getId();
+            }
+            bestNodeId = node.getId();
+        }
+        return bestNodeId;
+    }
+
+    private void playSoundId(int soundId) {
+        Log.d(TAG, "playSoundId() called");
+        if (playerNodeId != null) {
+            byte[] message = new byte[1];
+            message[0] = ((byte) soundId);
+            Wearable.MessageApi.sendMessage(mGoogleApiClient, playerNodeId,
+                    "soundremoteplayer", message).setResultCallback(
+                    new ResultCallback<MessageApi.SendMessageResult>() {
+                        @Override
+                        public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
+                            if (!sendMessageResult.getStatus().isSuccess()) {
+                                Log.d(TAG, "message FAILED to send");
+                            }
+                        }
+                    }
+            );
+        }
+    }
 
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
