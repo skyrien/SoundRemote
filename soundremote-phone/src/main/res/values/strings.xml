@@ -3,7 +3,8 @@
     <string name="sound1_txt">Sound 1</string>
     <string name="sound2_txt">Sound 2</string>
     <string name="sound3_txt">Sound 3</string>
-    <string name="sound1_path">Path/Sound1</string>
-    <string name="sound2_path">Path/Sound2</string>
-    <string name="sound3_path">Path/Sound3</string>
+    <string name="title_text">Title</string>
+    <string name="sound1_path">android.resource://com.skyrien.soundremote/raw/sample1</string>
+    <string name="sound2_path">android.resource://com.skyrien.soundremote/raw/sample2</string>
+    <string name="sound3_path">android.resource://com.skyrien.soundremote/raw/sample3</string>
 </resources>
