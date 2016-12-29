@@ -2,6 +2,7 @@ package com.skyrien.soundremote;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.util.Log;
@@ -10,10 +11,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
@@ -45,22 +48,17 @@ public class MainActivity extends WearableActivity {
         setAmbientEnabled();
         Log.d(TAG, "onCreate() called");
 
-        // For V1, we'll include 3 variable sounds, though the layout is hardcoded.
-        // For V2, we'll try to genericize this into a ListView
-        mContainerView = (BoxInsetLayout) findViewById(R.id.container);
-        mImageButton1 = (ImageButton) findViewById(R.id.sound1_img);
-        mImageButton2 = (ImageButton) findViewById(R.id.sound2_img);
-        mImageButton3 = (ImageButton) findViewById(R.id.sound3_img);
-        mText1 = (TextView) findViewById(R.id.sound1_txt);
-        mText2 = (TextView) findViewById(R.id.sound2_txt);
-        mText3 = (TextView) findViewById(R.id.sound3_txt);
-        mTitleText = (TextView) findViewById(R.id.titleText);
+        // Set up the API client
+        initGoogleApiClient();
+        initUiFields();
 
+        /*
         // Now, figure out if there's a suitable player for this watch
         CapabilityApi.GetCapabilityResult result =
                 Wearable.CapabilityApi.getCapability(mGoogleApiClient, "soundremoteplayer",
-                        CapabilityApi.FILTER_REACHABLE).await();
-        updateSoundRemoteCapability(result.getCapability());
+                        CapabilityApi.FILTER_REACHABLE)
+                .setResultCallbac
+        */
 
 
         // Set up a capability listener
@@ -74,27 +72,12 @@ public class MainActivity extends WearableActivity {
         Wearable.CapabilityApi.addCapabilityListener(mGoogleApiClient,
                                                         capabilityListener, "soundremoteplayer");
 
-        // Set up listeners for buttons
-        mImageButton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Button 1 pressed!", Toast.LENGTH_SHORT).show();
-            }
-        });
 
-        mImageButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Button 2 pressed!", Toast.LENGTH_SHORT).show();
-            }
-        });
 
-        mImageButton3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Button 3 pressed!", Toast.LENGTH_SHORT).show();
-            }
-        });
+    }
+
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "onConnected() called");
 
     }
 
@@ -167,4 +150,77 @@ public class MainActivity extends WearableActivity {
             mText3.setTextColor(getResources().getColor(android.R.color.black));
         }
     }
+
+    private void initGoogleApiClient() {
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle connectionHint) {
+                        Log.d(TAG, "onConnected: " + connectionHint);
+                        // use it
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int cause) {
+                        Log.d(TAG, "onConnectionSuspended: " + cause);
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult result) {
+                        Log.d(TAG, "onConnectionFailed: " + result);
+                    }
+                })
+                .addApi(Wearable.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
+    private void initUiFields() {
+
+        mContainerView = (BoxInsetLayout) findViewById(R.id.container);
+        mImageButton1 = (ImageButton) findViewById(R.id.sound1_img);
+        mImageButton2 = (ImageButton) findViewById(R.id.sound2_img);
+        mImageButton3 = (ImageButton) findViewById(R.id.sound3_img);
+        mText1 = (TextView) findViewById(R.id.sound1_txt);
+        mText2 = (TextView) findViewById(R.id.sound2_txt);
+        mText3 = (TextView) findViewById(R.id.sound3_txt);
+        mTitleText = (TextView) findViewById(R.id.titleText);
+
+        // Set up listeners for buttons
+        mImageButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Button 1 pressed!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Button 1 pressed!");
+            }
+        });
+
+        mImageButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Button 2 pressed!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Button 2 pressed!");
+            }
+        });
+
+        mImageButton3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Button 3 pressed!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Button 3 pressed!");
+            }
+        });
+    }
+
+    private void sendMessage(final String path, final String text) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
 }
