@@ -16,17 +16,16 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityInfo;
-import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Set;
 
 public class MainActivity extends WearableActivity {
+
+    // SECTION 1:
+    // THIS SECTION DEALS WITH ACTIVITY SETUP
 
     private static final String TAG = "MainActivity";
     private GoogleApiClient mGoogleApiClient;
@@ -48,59 +47,22 @@ public class MainActivity extends WearableActivity {
         setAmbientEnabled();
         Log.d(TAG, "onCreate() called");
 
-        // Set up the API client
+        // Set up the API client - also connects to nodes
         initGoogleApiClient();
+
+        // Setting up listners and links for all UI items
         initUiFields();
 
-        /*
-        // Now, figure out if there's a suitable player for this watch
-        CapabilityApi.GetCapabilityResult result =
-                Wearable.CapabilityApi.getCapability(mGoogleApiClient, "soundremoteplayer",
-                        CapabilityApi.FILTER_REACHABLE)
-                .setResultCallbac
-        */
-
-
-        // Set up a capability listener
-        CapabilityApi.CapabilityListener capabilityListener =
-                new CapabilityApi.CapabilityListener() {
-                    @Override
-                    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
-                        updateSoundRemoteCapability(capabilityInfo);
-                    }
-                };
-        Wearable.CapabilityApi.addCapabilityListener(mGoogleApiClient,
-                                                        capabilityListener, "soundremoteplayer");
-
-
 
     }
 
-    public void onConnected(Bundle bundle) {
-        Log.d(TAG, "onConnected() called");
+    // SECTION 2:
+    // THIS IS ACTIVITY LOGIC
+    //
 
-    }
-
-    private void updateSoundRemoteCapability(CapabilityInfo capabilityInfo) {
-        Log.d(TAG, "updateSoundRemoteCapability() called");
-        Set<Node> connectedNodes = capabilityInfo.getNodes();
-        playerNodeId = pickBestNodeId(connectedNodes);
-    }
-
-    private String pickBestNodeId(Set<Node> nodes) {
-        Log.d(TAG, "pickBestNodeId() called");
-        String bestNodeId = null;
-        for (Node node : nodes) {
-            if (node.isNearby()) {
-                return node.getId();
-            }
-            bestNodeId = node.getId();
-        }
-        return bestNodeId;
-    }
-
-    private void playSoundId(int soundId) {
-        Log.d(TAG, "playSoundId() called");
+    // This function(will be) is called when a button is pressed for a particular sound.
+    private void playRemoteSound(int soundId) {
+        Log.d(TAG, "playSoundId() called for sound: " + String.valueOf(soundId));
         if (playerNodeId != null) {
             byte[] message = new byte[1];
             message[0] = ((byte) soundId);
@@ -117,6 +79,9 @@ public class MainActivity extends WearableActivity {
             );
         }
     }
+
+    // SECTION 3:
+    // BOILERPLATE FOR WEAR
 
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
@@ -151,14 +116,23 @@ public class MainActivity extends WearableActivity {
         }
     }
 
+    // SECTION 4:
+    // SUPPORT UTILITY FUNCTIONS
+    //
+
     private void initGoogleApiClient() {
+        Log.d(TAG, "Called initGoogleApiClient()");
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(@Nullable Bundle connectionHint) {
                         Log.d(TAG, "onConnected: " + connectionHint);
-                        // use it
+                        // so this is the callback for a successful connection
+                        // I should probably add an event here to detect capabilities
+
+                        setupSoundremoteplayer();
+
                     }
 
                     @Override
@@ -177,6 +151,65 @@ public class MainActivity extends WearableActivity {
         mGoogleApiClient.connect();
     }
 
+    // This method detects local nodes nearby and if found... should do something
+    public void setupSoundremoteplayer() {
+        // Check for capable sound remote player nodes
+        Wearable.CapabilityApi.getCapability(mGoogleApiClient, "soundremoteplayer",
+                CapabilityApi.FILTER_REACHABLE)
+                .setResultCallback(new ResultCallback<CapabilityApi.GetCapabilityResult>() {
+                    @Override
+                    public void onResult(CapabilityApi.GetCapabilityResult result) {
+                        Log.d(TAG, "getCapability returned onResult() -- found: " + result.getCapability().hashCode());
+                        updateSoundRemoteCapability(result.getCapability());
+                    }
+                });
+
+
+        // Adding a listener to support updating based on changes
+        CapabilityApi.CapabilityListener capabilityListener =
+                new CapabilityApi.CapabilityListener() {
+                    @Override
+                    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
+                        Log.d(TAG, "onCapabilityChanged() called");
+                        updateSoundRemoteCapability(capabilityInfo);
+                    }
+                };
+        Wearable.CapabilityApi.addCapabilityListener(
+                mGoogleApiClient,
+                capabilityListener,
+                "soundremoteplayer");
+
+    }
+
+    // This method actually updates the local representation of nodes based on what it finds
+    private void updateSoundRemoteCapability(CapabilityInfo capabilityInfo) {
+        Log.d(TAG, "updateSoundRemoteCapability() called");
+        Set<Node> connectedNodes = capabilityInfo.getNodes();
+        playerNodeId = pickBestNodeId(connectedNodes);
+    }
+
+    private String pickBestNodeId(Set<Node> nodes) {
+        Log.d(TAG, "pickBestNodeId() called -- Total nodes: " + nodes.size());
+        String bestNodeId = null;
+        for (Node node : nodes) {
+            if (node.isNearby()) {
+                Log.d(TAG, "Found nearby node: " + node.getDisplayName());
+                return node.getId();
+            }
+            bestNodeId = node.getId();
+            Log.d(TAG, "Found best node: " + node.getDisplayName());
+        }
+        Log.d(TAG, "Found best node: " + bestNodeId);
+        return bestNodeId;
+    }
+
+
+
+
+
+
+
+
     private void initUiFields() {
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
@@ -194,6 +227,7 @@ public class MainActivity extends WearableActivity {
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Button 1 pressed!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Button 1 pressed!");
+                playRemoteSound(1);
             }
         });
 
@@ -202,6 +236,7 @@ public class MainActivity extends WearableActivity {
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Button 2 pressed!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Button 2 pressed!");
+                playRemoteSound(2);
             }
         });
 
@@ -210,6 +245,7 @@ public class MainActivity extends WearableActivity {
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Button 3 pressed!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Button 3 pressed!");
+                playRemoteSound(3);
             }
         });
     }
