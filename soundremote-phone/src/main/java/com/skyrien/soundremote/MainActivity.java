@@ -15,14 +15,9 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.CapabilityApi;
-import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
-
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,11 +46,8 @@ public class MainActivity extends AppCompatActivity {
         initGoogleApiClient();
         initUiFields();
 
-        // Start listener service -- how do we know it's started?
-        // Is there a way to start the whole service in a new thread?
+        // Start listener service
         startService(new Intent(this, DataLayerListenerService.class));
-
-
 
         // Setting hardware volume controls for music streaming control
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -113,11 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onConnected(@Nullable Bundle connectionHint) {
                         Log.d(TAG, "onConnected: " + connectionHint);
-                        // so this is the callback for a successful connection
-                        // I should probably add an event here to detect capabilities
-
                         setupSoundremoteplayer();
-
                     }
 
                     @Override
@@ -137,44 +125,15 @@ public class MainActivity extends AppCompatActivity {
         mGoogleApiClient.connect();
     }
 
-    // This method detects local nodes nearby and if found... should do something
+    // This method sets up the target node (the local node)
     public void setupSoundremoteplayer() {
         Log.d(TAG, "setupSoundremotePlayer() called");
-        // Check for capable sound remote player nodes
-        Wearable.CapabilityApi.getCapability(mGoogleApiClient, "soundremoteplayer",
-                CapabilityApi.FILTER_REACHABLE)
-                .setResultCallback(new ResultCallback<CapabilityApi.GetCapabilityResult>() {
-                    @Override
-                    public void onResult(CapabilityApi.GetCapabilityResult result) {
-                        Log.d(TAG, "getCapability returned onResult() -- found: " + result.getCapability().hashCode());
-                        updateSoundRemoteCapability(result.getCapability());
-                    }
-                });
 
-
-        // Adding a listener to support updating based on changes
-        CapabilityApi.CapabilityListener capabilityListener =
-                new CapabilityApi.CapabilityListener() {
-                    @Override
-                    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
-                        Log.d(TAG, "onCapabilityChanged() called");
-                        updateSoundRemoteCapability(capabilityInfo);
-                    }
-                };
-        Wearable.CapabilityApi.addCapabilityListener(
-                mGoogleApiClient,
-                capabilityListener,
-                "soundremoteplayer");
-
-    }
-
-    // This method actually updates the local representation of nodes based on what it finds
-    private void updateSoundRemoteCapability(CapabilityInfo capabilityInfo) {
-        Log.d(TAG, "updateSoundRemoteCapability() called");
+        // Bypasses lots of note searching since we already know we only need the local node
         Wearable.NodeApi.getLocalNode(mGoogleApiClient).setResultCallback(
                 new ResultCallback<NodeApi.GetLocalNodeResult>() {
                     @Override
-                    public void onResult(NodeApi.GetLocalNodeResult getLocalNodeResult) {
+                    public void onResult(@NonNull NodeApi.GetLocalNodeResult getLocalNodeResult) {
                         playerNodeId = getLocalNodeResult.getNode().getId();
                         Log.d(TAG, "onResult() called and found local node: " + playerNodeId);
                     }

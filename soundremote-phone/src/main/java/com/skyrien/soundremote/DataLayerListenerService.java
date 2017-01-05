@@ -1,12 +1,9 @@
 package com.skyrien.soundremote;
 
 import android.content.ContentResolver;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,7 +21,6 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import java.io.FileDescriptor;
 import java.util.Set;
 
 /**
