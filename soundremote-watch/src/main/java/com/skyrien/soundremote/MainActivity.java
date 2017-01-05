@@ -64,7 +64,7 @@ public class MainActivity extends WearableActivity {
     private void playRemoteSound(final int soundId) {
         Log.d(TAG, "playRemoteSound() called for sound: " + String.valueOf(soundId));
         if (playerNodeId != null) {
-            Log.d(TAG, "Found: " + playerNodeId);
+            //Log.d(TAG, "Found: " + playerNodeId);
 
             // We use a single byte as the payload, which includes the SoundId
             final byte[] message = new byte[1];
@@ -83,6 +83,7 @@ public class MainActivity extends WearableActivity {
             );
         }
         else { // no player found
+            Toast.makeText(MainActivity.this, "No player found!", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "BOO! No SoundRemotePlayer found.");
         }
     }
@@ -161,6 +162,7 @@ public class MainActivity extends WearableActivity {
 
     // This method detects local nodes nearby and if found... should do something
     public void setupSoundremoteplayer() {
+        Log.d(TAG, "setupSoundremotePlayer() called");
         // Check for capable sound remote player nodes
         Wearable.CapabilityApi.getCapability(mGoogleApiClient, "soundremoteplayer",
                 CapabilityApi.FILTER_REACHABLE)
@@ -233,7 +235,7 @@ public class MainActivity extends WearableActivity {
         mImageButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Button 1 pressed!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "Button 1 pressed!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Button 1 pressed!");
                 playRemoteSound(1);
             }
@@ -242,7 +244,7 @@ public class MainActivity extends WearableActivity {
         mImageButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Button 2 pressed!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "Button 2 pressed!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Button 2 pressed!");
                 playRemoteSound(2);
             }
@@ -251,7 +253,7 @@ public class MainActivity extends WearableActivity {
         mImageButton3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Button 3 pressed!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "Button 3 pressed!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Button 3 pressed!");
                 playRemoteSound(3);
             }

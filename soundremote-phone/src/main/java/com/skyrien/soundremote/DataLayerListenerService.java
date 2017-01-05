@@ -1,8 +1,13 @@
 package com.skyrien.soundremote;
 
+import android.content.ContentResolver;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +24,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.io.FileDescriptor;
 import java.util.Set;
 
 /**
@@ -29,14 +35,14 @@ public class DataLayerListenerService extends WearableListenerService
         implements MessageApi.MessageListener {
 
     private static final String TAG = "DATALAYERLISTENER";
-    private static final String START_ACTIVITY_PATH = "/start-activity";
-    private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";
-
-    private GoogleApiClient mGoogleApiClient;
 
     // Setup App References here
+    private GoogleApiClient mGoogleApiClient;
+    private AssetManager assetManager;
+
     private String remoteNodeId;
-    private SoundPool soundPool;
+    private MediaPlayer[] mediaPlayers;
+    private Uri[] soundUri;
     private int soundId1, soundId2, soundId3;
     boolean plays = false, loaded = false;
     float actVolume, maxVolume, volume;
@@ -48,15 +54,36 @@ public class DataLayerListenerService extends WearableListenerService
         Log.d(TAG, "onCreate() called");
         super.onCreate();
 
+        // Async load of API Client
         initGoogleApiClient();
-        initAudioPool();
-        Wearable.MessageApi.addListener(mGoogleApiClient, this);
 
+        // Media and AudioManager stuff
+        mediaPlayers = new MediaPlayer[3];
+        soundUri = new Uri[3];
+        for (int i = 0; i <= 2; i++) {
+            mediaPlayers[i] = new MediaPlayer();
+        }
+
+        audioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
+        actVolume = (float)audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        maxVolume = (float)audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        volume = actVolume / maxVolume;
+        Log.d(TAG, "AudioManager created with vol: " + volume);
+
+        // Async load of audio files
+        initAudioPool();
+
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
+
 
     @Override
     public void onDestroy() {
         stopGoogleApiClient();
+        mediaPlayers[0].release();
+        mediaPlayers[1].release();
+        mediaPlayers[2].release();
+
         super.onDestroy();
     }
 
@@ -98,8 +125,6 @@ public class DataLayerListenerService extends WearableListenerService
                 .build();
         Log.d(TAG, "Connecting to GoogleApiClient...");
         mGoogleApiClient.connect();
-
-
 }
 
 
@@ -171,68 +196,56 @@ public class DataLayerListenerService extends WearableListenerService
 
 
     private void initAudioPool() {
+        Log.d(TAG, "initAudioPool() called");
 
-        // AudioManager stuff
-        audioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
-        actVolume = (float)audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        maxVolume = (float)audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        volume = actVolume / maxVolume;
-        Log.d(TAG, "AudioManager created with vol: " + volume);
+        try {
 
-        counter = 0;
+            // Load internal assets
+            String RESOURCE_PATH = ContentResolver.SCHEME_ANDROID_RESOURCE + "://";
+            String path = RESOURCE_PATH + getPackageName() + "/";
+            soundUri[0] = Uri.parse(path + R.raw.sample1);
+            soundUri[1] = Uri.parse(path + R.raw.sample2);
+            soundUri[2] = Uri.parse(path + R.raw.sample3);
 
-        // Creating AudioAttributes so we can create a SoundPool
-        AudioAttributes attributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build();
-
-        // Loading sounds
-        soundPool = new SoundPool.Builder()
-                .setAudioAttributes(attributes)
-                .build();
-
-        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-            @Override
-            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                loaded = true;
-                Log.d(TAG, "SoundPool Created for sampleId: " + sampleId);
-
+            for (int i = 0; i <= 2; i++) {
+                mediaPlayers[i].setDataSource(getApplicationContext(), soundUri[i]);
+                mediaPlayers[i].prepareAsync();
             }
-        });
 
-
-        // For some reason, this method doesn't work well... let's try hardcoded res paths:
-/*
-        soundId1 = soundPool.load(getString(R.string.sound1_path), 1);
-        Log.d(TAG, "Loaded Sound 1 from path: " + getString(R.string.sound1_path));
-
-        soundId2 = soundPool.load(getString(R.string.sound2_path), 1);
-        Log.d(TAG, "Loaded Sound 2 from path: " + getString(R.string.sound2_path));
-
-        soundId3 = soundPool.load(getString(R.string.sound3_path), 1);
-        Log.d(TAG, "Loaded Sound 3 from path: " + getString(R.string.sound3_path));
-*/
-
-        // Loading hard coded sound assets
-        soundId1 = soundPool.load(this, R.raw.sample1, 1);
-        Log.d(TAG, "Loaded Sound 1");
-        soundId2 = soundPool.load(this, R.raw.sample2, 1);
-        Log.d(TAG, "Loaded Sound 2");
-        soundId3 = soundPool.load(this, R.raw.sample3, 1);
-        Log.d(TAG, "Loaded Sound 3");
+        } catch (Throwable e) {
+            Log.e(TAG, "Something happened while setting data source.");
+            e.printStackTrace();
+        }
     }
+
 
 
     public void playSoundId(int soundId) {
+        Log.d(TAG, "playSoundId() called for soundId: " + soundId);
+        int requestIndex = soundId - 1;
+        //mediaPlayers[requestIndex].start();
 
-        soundPool.play(soundId, volume, volume, 1, 0, 1f);
+        for (int i = 0; i <= 2; i++) {
+            // The right sound and player
+            if (i == (requestIndex))
+            {
+                if (!mediaPlayers[i].isPlaying()) {
+                    mediaPlayers[i].start();
+                }
+                else { // if it is playing, seek to 0 while keeping in play
+                    mediaPlayers[i].seekTo(0);
+                    }
+            }
+
+
+            else if (i != (requestIndex) && mediaPlayers[i].isPlaying()) {
+                mediaPlayers[i].stop();
+                mediaPlayers[i].prepareAsync();
+            }
+        }
+
 
     }
-
-
-
-
 
 
 }
