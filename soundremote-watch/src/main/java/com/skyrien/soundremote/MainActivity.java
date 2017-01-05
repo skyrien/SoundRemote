@@ -48,9 +48,9 @@ public class MainActivity extends WearableActivity {
         Log.d(TAG, "onCreate() called");
 
         // Set up the API client - also connects to nodes
-        initGoogleApiClient();
+        initGoogleApiClient(); // this sets the player node id in the background
 
-        // Setting up listners and links for all UI items
+        // Setting up listeners and links for all UI items
         initUiFields();
 
 
@@ -61,10 +61,13 @@ public class MainActivity extends WearableActivity {
     //
 
     // This function(will be) is called when a button is pressed for a particular sound.
-    private void playRemoteSound(int soundId) {
-        Log.d(TAG, "playSoundId() called for sound: " + String.valueOf(soundId));
+    private void playRemoteSound(final int soundId) {
+        Log.d(TAG, "playRemoteSound() called for sound: " + String.valueOf(soundId));
         if (playerNodeId != null) {
-            byte[] message = new byte[1];
+            Log.d(TAG, "Found: " + playerNodeId);
+
+            // We use a single byte as the payload, which includes the SoundId
+            final byte[] message = new byte[1];
             message[0] = ((byte) soundId);
             Wearable.MessageApi.sendMessage(mGoogleApiClient, playerNodeId,
                     "soundremoteplayer", message).setResultCallback(
@@ -74,9 +77,13 @@ public class MainActivity extends WearableActivity {
                             if (!sendMessageResult.getStatus().isSuccess()) {
                                 Log.d(TAG, "message FAILED to send");
                             }
+                            else Log.d(TAG, "Message sent: " + message[0]);
                         }
                     }
             );
+        }
+        else { // no player found
+            Log.d(TAG, "BOO! No SoundRemotePlayer found.");
         }
     }
 
@@ -148,6 +155,7 @@ public class MainActivity extends WearableActivity {
                 })
                 .addApi(Wearable.API)
                 .build();
+        Log.d(TAG, "Connecting to GoogleApiClient...");
         mGoogleApiClient.connect();
     }
 
@@ -189,7 +197,7 @@ public class MainActivity extends WearableActivity {
     }
 
     private String pickBestNodeId(Set<Node> nodes) {
-        Log.d(TAG, "pickBestNodeId() called -- Total nodes: " + nodes.size());
+        Log.d(TAG, "pickBestNodeId() called -- Other nodes: " + nodes.size());
         String bestNodeId = null;
         for (Node node : nodes) {
             if (node.isNearby()) {
@@ -250,6 +258,9 @@ public class MainActivity extends WearableActivity {
         });
     }
 
+    // Was originally gonna use this helper function to send messages, but embedded the logic in
+    // playRemoteSound() instead.
+    /*
     private void sendMessage(final String path, final String text) {
         new Thread(new Runnable() {
             @Override
@@ -258,5 +269,7 @@ public class MainActivity extends WearableActivity {
             }
         });
     }
+    */
+
 
 }
