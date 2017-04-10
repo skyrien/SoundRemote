@@ -54,11 +54,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate() called");
 
-        //SharedPreferences settings = getPreferences(0);
-
         // Initialize stuff
         initUiFields();
         initGoogleApiClient();
+
+        SharedPreferences settings = getSharedPreferences(SETTINGS,0);
+
+        // Let's update UI fields from sharedPrefs
+        mSound1Path.setText(settings.getString("sound1Path","0"));
+        mSound2Path.setText(settings.getString("sound2Path","0"));
+        mSound3Path.setText(settings.getString("sound3Path","0"));
+
 
         // Let's check and request for permissions here
     if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -95,9 +101,7 @@ public class MainActivity extends AppCompatActivity {
         //intent.setType("audio/*");
 
         Log.d(TAG,"starting activity...");
-
         startActivityForResult(intent, requestCode);
-
         Log.d(TAG,"Moving on...");
     }
 
@@ -111,8 +115,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         Log.d(TAG, "onActivityResult() called");
-        SharedPreferences settings = getSharedPreferences(SETTINGS,0);
-        SharedPreferences.Editor spEditor = settings.edit();
 
         if(resultCode == Activity.RESULT_OK) {
             String selectedSoundNum = "sound" + String.valueOf(requestCode) + "Path";
@@ -128,19 +130,20 @@ public class MainActivity extends AppCompatActivity {
 
                 // The value of 'selectedSoundNum' is "sound" + requestCode + Path; ex: sound1Path
                 Log.d(TAG, "Writing to SharedPreferences: " + selectedSoundNum);
+                SharedPreferences settings = getSharedPreferences(SETTINGS,0);
+                SharedPreferences.Editor spEditor = settings.edit();
                 spEditor.putString(selectedSoundNum,inputUri.toString());
                 spEditor.commit();
-
                 Toast.makeText(MainActivity.this, inputUri.toString(), Toast.LENGTH_SHORT).show();
 
-                // We should also, you know, actually *do* something with the result?
-                // Specifically, it should trigger a reload of audio from the service from SP.
+                // Let's update UI fields from sharedPrefs
+                mSound1Path.setText(settings.getString("sound1Path","0"));
+                mSound2Path.setText(settings.getString("sound2Path","0"));
+                mSound3Path.setText(settings.getString("sound3Path","0"));
 
                 // We're overloading playRemoteSound 0 to trigger a reload of audio on the
                 // DataLayerListenerService
                 playRemoteSound(0);
-
-
             }
             else Log.d(TAG, "Result data null!");
 

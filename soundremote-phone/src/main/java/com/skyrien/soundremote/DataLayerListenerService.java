@@ -201,17 +201,6 @@ public class DataLayerListenerService extends WearableListenerService
         Log.d(TAG, "initAudioPool() called");
 
         try {
-
-            /*
-            // Don't need this as we've set these as default values in onCreate
-            // Load internal assets
-            String RESOURCE_PATH = ContentResolver.SCHEME_ANDROID_RESOURCE + "://";
-            String path = RESOURCE_PATH + getPackageName() + "/";
-            soundUri[0] = Uri.parse(path + R.raw.sample1);
-            soundUri[1] = Uri.parse(path + R.raw.sample2);
-            soundUri[2] = Uri.parse(path + R.raw.sample3);
-            */
-
             // Load SharedPreferences values into local instance of soundUri
             // should we validate or trust the source?
             SharedPreferences settings = getSharedPreferences(SETTINGS,0);
@@ -223,6 +212,7 @@ public class DataLayerListenerService extends WearableListenerService
             soundUri[2] = Uri.parse(settings.getString("sound3Path", path + R.raw.sample3));
             Log.d(TAG, "Found #3: " + soundUri[2].toString());
 
+            // Load the new files
             for (int i = 0; i <= 2; i++) {
                 mediaPlayers[i] = new MediaPlayer();
                 mediaPlayers[i].setDataSource(getApplicationContext(), soundUri[i]);
@@ -235,8 +225,6 @@ public class DataLayerListenerService extends WearableListenerService
         }
     }
 
-
-
     public void playSoundId(int soundId) {
         Log.d(TAG, "playSoundId() called for soundId: " + soundId);
 
@@ -248,7 +236,7 @@ public class DataLayerListenerService extends WearableListenerService
             for (int i = 0; i <= 2; i++) {
                 mediaPlayers[i].release();
             }
-            
+
             initAudioPool();
             return;
         }
@@ -267,7 +255,6 @@ public class DataLayerListenerService extends WearableListenerService
                     mediaPlayers[i].seekTo(0);
                     }
             }
-
 
             else if (i != (requestIndex) && mediaPlayers[i].isPlaying()) {
                 mediaPlayers[i].stop();
