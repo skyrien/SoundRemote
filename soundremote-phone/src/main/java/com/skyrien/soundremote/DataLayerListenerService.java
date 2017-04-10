@@ -1,6 +1,7 @@
 package com.skyrien.soundremote;
 
 import android.content.ContentResolver;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -31,6 +32,10 @@ public class DataLayerListenerService extends WearableListenerService
         implements MessageApi.MessageListener {
 
     private static final String TAG = "DATALAYERLISTENER";
+    private static final String SETTINGS = "SoundRemote";
+    String RESOURCE_PATH = ContentResolver.SCHEME_ANDROID_RESOURCE + "://";
+    String path = RESOURCE_PATH + getPackageName() + "/";
+
 
     // Setup App References here
     private GoogleApiClient mGoogleApiClient;
@@ -56,15 +61,16 @@ public class DataLayerListenerService extends WearableListenerService
         // Media and AudioManager stuff
         mediaPlayers = new MediaPlayer[3];
         soundUri = new Uri[3];
-        for (int i = 0; i <= 2; i++) {
-            mediaPlayers[i] = new MediaPlayer();
-        }
 
         audioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         actVolume = (float)audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVolume = (float)audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         volume = actVolume / maxVolume;
         Log.d(TAG, "AudioManager created with vol: " + volume);
+
+
+
+
 
         // Async load of audio files
         initAudioPool();
@@ -191,19 +197,34 @@ public class DataLayerListenerService extends WearableListenerService
     }
 
 
-    private void initAudioPool() {
+    public void initAudioPool() {
         Log.d(TAG, "initAudioPool() called");
 
         try {
 
+            /*
+            // Don't need this as we've set these as default values in onCreate
             // Load internal assets
             String RESOURCE_PATH = ContentResolver.SCHEME_ANDROID_RESOURCE + "://";
             String path = RESOURCE_PATH + getPackageName() + "/";
             soundUri[0] = Uri.parse(path + R.raw.sample1);
             soundUri[1] = Uri.parse(path + R.raw.sample2);
             soundUri[2] = Uri.parse(path + R.raw.sample3);
+            */
+
+            // Load SharedPreferences values into local instance of soundUri
+            // should we validate or trust the source?
+            SharedPreferences settings = getSharedPreferences(SETTINGS,0);
+            Log.d(TAG, "Loading from SharedPreferences...");
+            soundUri[0] = Uri.parse(settings.getString("sound1Path", path + R.raw.sample1));
+            Log.d(TAG, "Found #1: " + soundUri[0].toString());
+            soundUri[1] = Uri.parse(settings.getString("sound2Path", path + R.raw.sample2));
+            Log.d(TAG, "Found #2: " + soundUri[1].toString());
+            soundUri[2] = Uri.parse(settings.getString("sound3Path", path + R.raw.sample3));
+            Log.d(TAG, "Found #3: " + soundUri[2].toString());
 
             for (int i = 0; i <= 2; i++) {
+                mediaPlayers[i] = new MediaPlayer();
                 mediaPlayers[i].setDataSource(getApplicationContext(), soundUri[i]);
                 mediaPlayers[i].prepareAsync();
             }
@@ -218,6 +239,20 @@ public class DataLayerListenerService extends WearableListenerService
 
     public void playSoundId(int soundId) {
         Log.d(TAG, "playSoundId() called for soundId: " + soundId);
+
+        // soundId == 0 is a special message to trigger a reload of the audio files.
+        // No other action needs to be taken so we return afterward
+        if (soundId == 0) {
+            Log.d(TAG, "Reinitializing audio pool");
+
+            for (int i = 0; i <= 2; i++) {
+                mediaPlayers[i].release();
+            }
+            
+            initAudioPool();
+            return;
+        }
+
         int requestIndex = soundId - 1;
         //mediaPlayers[requestIndex].start();
 
