@@ -82,23 +82,19 @@ public class MainActivity extends AppCompatActivity {
         }
         // Setting hardware volume controls for music streaming control
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-
     }
 
     // loadFilePicker() provides a pickable index
     public void loadFilePicker(int requestCode) {
         Log.d(TAG,"loadFilePicker() called");
 
-        // Currently, we're going to use the Ringtone manager to give us media URI to work with
-        // but later on, this should be a generic file picker.
+        // We're going to use the Ringtone manager to give us media URI to work with
+        // but later on, this could be a generic file picker.
         //
         // Though... maybe... we should make it easy to use ringtones?
 
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-        //intent.addCategory(Intent.CATEGORY_OPENABLE);
-        //intent.setType("audio/*");
 
         Log.d(TAG,"starting activity...");
         startActivityForResult(intent, requestCode);
@@ -114,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        Log.d(TAG, "onActivityResult() called");
+        Log.d(TAG, "onActivityResult() called for: " + String.valueOf(requestCode));
 
         if(resultCode == Activity.RESULT_OK) {
             String selectedSoundNum = "sound" + String.valueOf(requestCode) + "Path";
@@ -137,13 +133,34 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, inputUri.toString(), Toast.LENGTH_SHORT).show();
 
                 // Let's update UI fields from sharedPrefs
-                mSound1Path.setText(settings.getString("sound1Path","0"));
-                mSound2Path.setText(settings.getString("sound2Path","0"));
-                mSound3Path.setText(settings.getString("sound3Path","0"));
+                String thePath;
+                switch(requestCode) {
+
+                    case 1:
+                        thePath = settings.getString("sound1Path","0");
+                        mSound1Path.setText(thePath);
+                        mSound1Txt.setText("Sound 1a");
+                        playRemoteSound(-1);
+                        break;
+
+                    case 2:
+                        thePath = settings.getString("sound2Path","0");
+                        mSound2Path.setText(thePath);
+                        mSound2Txt.setText("Sound 2a");
+                        playRemoteSound(-2);
+                        break;
+
+                    case 3:
+                        thePath = settings.getString("sound3Path","0");
+                        mSound3Path.setText(thePath);
+                        mSound3Txt.setText("Sound 3a");
+                        playRemoteSound(-3);
+                        break;
+                }
 
                 // We're overloading playRemoteSound 0 to trigger a reload of audio on the
                 // DataLayerListenerService
-                playRemoteSound(0);
+                //playRemoteSound(0);
             }
             else Log.d(TAG, "Result data null!");
 
@@ -184,16 +201,6 @@ public class MainActivity extends AppCompatActivity {
         mSound2Button = (ImageButton) findViewById(R.id.sound2_img);
         mSound3Button = (ImageButton) findViewById(R.id.sound3_img);
 
-        // LOAD FROM PREFS
-        // this should load the path names from preferences file and update the local views
-        // note that the audio service is also loading from the same preferences file
-
-
-
-
-
-
-
         // Setting up listeners on buttons so they play
         mSound1Button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,24 +224,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Setting up listeners on path names so we can trigger a picker
+        // Setting up listeners on titles or path names so we can trigger a picker
+
+
         mSound1Path.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "Sound path 1 pressed");
-
-                // opens file picker...
                 loadFilePicker(1);
-
-                // The following code assumes its only run after the picker has set a value
-                // Basically, every time we want an updated value of the soundpaths, we need to pull
-                // from sharedpreferences.
-
-                // We should probably assume a zero-init state, where if empty, we'll just load the
-                // default value
-                Log.d(TAG,"Getting updated picker value for Sound 1");
-                //SharedPreferences settings = getPreferences(0);
-                //mSound1Path.setText(settings.getString("sound1Path", getString(R.string.sound1_path)));
             }
         });
         mSound2Path.setOnClickListener(new View.OnClickListener() {
@@ -251,7 +248,29 @@ public class MainActivity extends AppCompatActivity {
                 loadFilePicker(3);
             }
         });
+        mSound1Txt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Sound path 1 pressed");
+                loadFilePicker(1);
+            }
+        });
+        mSound2Txt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Sound path 2 pressed");
+                loadFilePicker(2);
+            }
+        });
+        mSound3Txt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Sound path 3 pressed");
+                loadFilePicker(3);
+            }
+        });
     }
+
 
     // SECTION 4:
     // SUPPORT UTILITY FUNCTIONS

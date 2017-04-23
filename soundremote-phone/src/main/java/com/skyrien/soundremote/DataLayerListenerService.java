@@ -220,15 +220,45 @@ public class DataLayerListenerService extends WearableListenerService
             }
 
         } catch (Throwable e) {
-            Log.e(TAG, "Something happened while setting data source.");
+            Log.e(TAG, "Something happened...");
             e.printStackTrace();
         }
+    }
+
+    public void reloadSoundId(int soundId) {
+        Log.d(TAG, "reloadSoundId() called for: " + String.valueOf(soundId));
+
+        try {
+            // Load SharedPreferences values into local instance of soundUri
+            // should we validate or trust the source?
+            SharedPreferences settings = getSharedPreferences(SETTINGS,0);
+            Log.d(TAG, "Loading from SharedPreferences...");
+
+            int i = soundId -1;
+            mediaPlayers[i].release();
+            soundUri[i] = Uri.parse(settings.getString("sound1Path", path + R.raw.sample1));
+            Log.d(TAG, "Updating " + String.valueOf(soundId) + " with: " + soundUri[i].toString());
+            mediaPlayers[i] = new MediaPlayer();
+            mediaPlayers[i].setDataSource(getApplicationContext(), soundUri[i]);
+            mediaPlayers[i].prepareAsync();
+
+
+        } catch (Throwable e) {
+            Log.e(TAG, "Something happened...");
+            e.printStackTrace();
+        }
+
     }
 
     public void playSoundId(int soundId) {
         Log.d(TAG, "playSoundId() called for soundId: " + soundId);
 
-        // soundId == 0 is a special message to trigger a reload of the audio files.
+        // soundId less than zero is a special case to reload a particular soundId
+        if (soundId < 0) {
+            reloadSoundId(-1*soundId);
+        }
+
+            // soundId == 0 is a special message to trigger a reload of all audio files.
         // No other action needs to be taken so we return afterward
         if (soundId == 0) {
             Log.d(TAG, "Reinitializing audio pool");
