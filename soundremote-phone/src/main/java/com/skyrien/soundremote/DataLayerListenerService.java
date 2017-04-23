@@ -234,9 +234,9 @@ public class DataLayerListenerService extends WearableListenerService
             SharedPreferences settings = getSharedPreferences(SETTINGS,0);
             Log.d(TAG, "Loading from SharedPreferences...");
 
-            int i = soundId -1;
+            int i = soundId - 1;
             mediaPlayers[i].release();
-            soundUri[i] = Uri.parse(settings.getString("sound1Path", path + R.raw.sample1));
+            soundUri[i] = Uri.parse(settings.getString("sound" + soundId + "Path", path + R.raw.sample1));
             Log.d(TAG, "Updating " + String.valueOf(soundId) + " with: " + soundUri[i].toString());
             mediaPlayers[i] = new MediaPlayer();
             mediaPlayers[i].setDataSource(getApplicationContext(), soundUri[i]);

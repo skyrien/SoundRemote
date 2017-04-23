@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private GoogleApiClient mGoogleApiClient;
     private String playerNodeId;
 
-    private TextView mTitle;
     private TextView mSound1Txt;
     private TextView mSound2Txt;
     private TextView mSound3Txt;
@@ -64,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
         mSound1Path.setText(settings.getString("sound1Path","0"));
         mSound2Path.setText(settings.getString("sound2Path","0"));
         mSound3Path.setText(settings.getString("sound3Path","0"));
-
+        mSound1Txt.setText(settings.getString("sound1Txt","Sound 1"));
+        mSound2Txt.setText(settings.getString("sound2Txt","Sound 2"));
+        mSound3Txt.setText(settings.getString("sound3Txt","Sound 3"));
 
         // Let's check and request for permissions here
     if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -114,21 +116,32 @@ public class MainActivity extends AppCompatActivity {
 
         if(resultCode == Activity.RESULT_OK) {
             String selectedSoundNum = "sound" + String.valueOf(requestCode) + "Path";
+            String selectedSoundNumFile = "sound" + String.valueOf(requestCode) + "Txt";
 
             if (resultData != null)
             {
-                Log.d(TAG, "Request Code: " + String.valueOf(resultCode) +
+                Log.d(TAG, "Request Code: " + String.valueOf(requestCode) +
                         " - Result OK: Fetching data, writing to SharedPrefs and toasting!");
 
                 // This saves the URI of the returned ringtone to SharedPreferences
-                Uri inputUri = resultData.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-                Log.d(TAG, "Found Uri: " + inputUri.toString());
+                Uri inputUri = resultData
+                        .getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
 
-                // The value of 'selectedSoundNum' is "sound" + requestCode + Path; ex: sound1Path
+                // This is to protect against null breaking the app; also prevents silence
+                // from being used
+                if (inputUri == null) {
+                    return;
+                }
+                Ringtone ring = RingtoneManager.getRingtone(this,inputUri);
+                Log.d(TAG, "Found file: " + ring.getTitle(this));
+
+
+                // This portion writes the path and ringtone title to sharedpreferences
                 Log.d(TAG, "Writing to SharedPreferences: " + selectedSoundNum);
                 SharedPreferences settings = getSharedPreferences(SETTINGS,0);
                 SharedPreferences.Editor spEditor = settings.edit();
                 spEditor.putString(selectedSoundNum,inputUri.toString());
+                spEditor.putString(selectedSoundNumFile,ring.getTitle(this));
                 spEditor.commit();
                 Toast.makeText(MainActivity.this, inputUri.toString(), Toast.LENGTH_SHORT).show();
 
@@ -139,28 +152,25 @@ public class MainActivity extends AppCompatActivity {
                     case 1:
                         thePath = settings.getString("sound1Path","0");
                         mSound1Path.setText(thePath);
-                        mSound1Txt.setText("Sound 1a");
+                        mSound1Txt.setText(ring.getTitle(this));
                         playRemoteSound(-1);
                         break;
 
                     case 2:
                         thePath = settings.getString("sound2Path","0");
                         mSound2Path.setText(thePath);
-                        mSound2Txt.setText("Sound 2a");
+                        mSound2Txt.setText(ring.getTitle(this));
                         playRemoteSound(-2);
                         break;
 
                     case 3:
                         thePath = settings.getString("sound3Path","0");
                         mSound3Path.setText(thePath);
-                        mSound3Txt.setText("Sound 3a");
+                        mSound3Txt.setText(ring.getTitle(this));
                         playRemoteSound(-3);
                         break;
                 }
 
-                // We're overloading playRemoteSound 0 to trigger a reload of audio on the
-                // DataLayerListenerService
-                //playRemoteSound(0);
             }
             else Log.d(TAG, "Result data null!");
 
@@ -186,8 +196,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "initUiFields() called");
 
         // Setup App Resources here
-        mTitle = (TextView) findViewById(R.id.title_txt);
-
         // These are the text on the right side
         mSound1Txt = (TextView) findViewById(R.id.sound1_txt);
         mSound2Txt = (TextView) findViewById(R.id.sound2_txt);

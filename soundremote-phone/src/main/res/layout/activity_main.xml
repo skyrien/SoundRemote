@@ -14,12 +14,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/title_txt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/title_text"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,6 +43,7 @@
                     android:id="@+id/sound1_path"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="invisible"
                     android:text="@string/sound1_path"/>
             </LinearLayout>
 
@@ -83,6 +78,7 @@
                     android:id="@+id/sound2_path"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="invisible"
                     android:text="@string/sound2_path"/>
             </LinearLayout>
         </LinearLayout>
@@ -115,6 +111,7 @@
                     android:id="@+id/sound3_path"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="invisible"
                     android:text="@string/sound3_path"/>
             </LinearLayout>
         </LinearLayout>
