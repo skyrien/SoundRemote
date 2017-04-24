@@ -205,11 +205,11 @@ public class DataLayerListenerService extends WearableListenerService
             // should we validate or trust the source?
             SharedPreferences settings = getSharedPreferences(SETTINGS,0);
             Log.d(TAG, "Loading from SharedPreferences...");
-            soundUri[0] = Uri.parse(settings.getString("sound1Path", path + R.raw.sample1));
+            soundUri[0] = Uri.parse(settings.getString("sound1Path", path + ""));
             Log.d(TAG, "Found #1: " + soundUri[0].toString());
-            soundUri[1] = Uri.parse(settings.getString("sound2Path", path + R.raw.sample2));
+            soundUri[1] = Uri.parse(settings.getString("sound2Path", path + ""));
             Log.d(TAG, "Found #2: " + soundUri[1].toString());
-            soundUri[2] = Uri.parse(settings.getString("sound3Path", path + R.raw.sample3));
+            soundUri[2] = Uri.parse(settings.getString("sound3Path", path + ""));
             Log.d(TAG, "Found #3: " + soundUri[2].toString());
 
             // Load the new files
@@ -236,7 +236,7 @@ public class DataLayerListenerService extends WearableListenerService
 
             int i = soundId - 1;
             mediaPlayers[i].release();
-            soundUri[i] = Uri.parse(settings.getString("sound" + soundId + "Path", path + R.raw.sample1));
+            soundUri[i] = Uri.parse(settings.getString("sound" + soundId + "Path", ""));
             Log.d(TAG, "Updating " + String.valueOf(soundId) + " with: " + soundUri[i].toString());
             mediaPlayers[i] = new MediaPlayer();
             mediaPlayers[i].setDataSource(getApplicationContext(), soundUri[i]);

@@ -72,9 +72,9 @@ public class MainActivity extends AppCompatActivity {
         // Let's update UI fields from sharedPrefs
 
         // Modifying these -- we want the path to now be the filename, while text is just the #
-        mSound1Path.setText(settings.getString("sound1Txt","0"));
-        mSound2Path.setText(settings.getString("sound2Txt","0"));
-        mSound3Path.setText(settings.getString("sound3Txt","0"));
+        mSound1Path.setText(settings.getString("sound1Txt",getString(R.string.sound1_path)));
+        mSound2Path.setText(settings.getString("sound2Txt",getString(R.string.sound2_path)));
+        mSound3Path.setText(settings.getString("sound3Txt",getString(R.string.sound3_path)));
         //mSound1Txt.setText(settings.getString("sound1Txt","Sound 1"));
         //mSound2Txt.setText(settings.getString("sound2Txt","Sound 2"));
         //mSound3Txt.setText(settings.getString("sound3Txt","Sound 3"));
