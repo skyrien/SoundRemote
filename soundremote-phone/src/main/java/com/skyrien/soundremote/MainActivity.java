@@ -23,11 +23,18 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,9 +51,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView mSound1Path;
     private TextView mSound2Path;
     private TextView mSound3Path;
+    private TextView mConnectionText;
     private ImageButton mSound1Button;
     private ImageButton mSound2Button;
     private ImageButton mSound3Button;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,20 +70,22 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(SETTINGS,0);
 
         // Let's update UI fields from sharedPrefs
-        mSound1Path.setText(settings.getString("sound1Path","0"));
-        mSound2Path.setText(settings.getString("sound2Path","0"));
-        mSound3Path.setText(settings.getString("sound3Path","0"));
-        mSound1Txt.setText(settings.getString("sound1Txt","Sound 1"));
-        mSound2Txt.setText(settings.getString("sound2Txt","Sound 2"));
-        mSound3Txt.setText(settings.getString("sound3Txt","Sound 3"));
+
+        // Modifying these -- we want the path to now be the filename, while text is just the #
+        mSound1Path.setText(settings.getString("sound1Txt","0"));
+        mSound2Path.setText(settings.getString("sound2Txt","0"));
+        mSound3Path.setText(settings.getString("sound3Txt","0"));
+        //mSound1Txt.setText(settings.getString("sound1Txt","Sound 1"));
+        //mSound2Txt.setText(settings.getString("sound2Txt","Sound 2"));
+        //mSound3Txt.setText(settings.getString("sound3Txt","Sound 3"));
 
         // Let's check and request for permissions here
-    if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                0);
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    0);
 
-    }
+        }
 
         // Start listener service
         if (!isMyServiceRunning(DataLayerListenerService.class))
@@ -84,6 +95,13 @@ public class MainActivity extends AppCompatActivity {
         }
         // Setting hardware volume controls for music streaming control
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+
+        // Let's load ads last
+        MobileAds.initialize(getApplicationContext(), getString(R.string.banner_ad_unit_id));
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     // loadFilePicker() provides a pickable index
@@ -132,11 +150,12 @@ public class MainActivity extends AppCompatActivity {
                 if (inputUri == null) {
                     return;
                 }
+
+                // This is where we get the title of the ringtone from the system
                 Ringtone ring = RingtoneManager.getRingtone(this,inputUri);
                 Log.d(TAG, "Found file: " + ring.getTitle(this));
 
-
-                // This portion writes the path and ringtone title to sharedpreferences
+                // This portion writes the path and ringtone title to SharedPreferences
                 Log.d(TAG, "Writing to SharedPreferences: " + selectedSoundNum);
                 SharedPreferences settings = getSharedPreferences(SETTINGS,0);
                 SharedPreferences.Editor spEditor = settings.edit();
@@ -145,31 +164,50 @@ public class MainActivity extends AppCompatActivity {
                 spEditor.commit();
                 Toast.makeText(MainActivity.this, inputUri.toString(), Toast.LENGTH_SHORT).show();
 
+
                 // Let's update UI fields from sharedPrefs
                 String thePath;
+
                 switch(requestCode) {
 
                     case 1:
                         thePath = settings.getString("sound1Path","0");
-                        mSound1Path.setText(thePath);
-                        mSound1Txt.setText(ring.getTitle(this));
+                        //mSound1Path.setText(thePath);
+                        mSound1Path.setText(ring.getTitle(this));
+
                         playRemoteSound(-1);
                         break;
 
                     case 2:
                         thePath = settings.getString("sound2Path","0");
-                        mSound2Path.setText(thePath);
-                        mSound2Txt.setText(ring.getTitle(this));
+                        //mSound2Path.setText(thePath);
+                        mSound2Path.setText(ring.getTitle(this));
+
                         playRemoteSound(-2);
                         break;
 
                     case 3:
                         thePath = settings.getString("sound3Path","0");
-                        mSound3Path.setText(thePath);
-                        mSound3Txt.setText(ring.getTitle(this));
+                        //mSound3Path.setText(thePath);
+                        mSound3Path.setText(ring.getTitle(this));
+
                         playRemoteSound(-3);
                         break;
                 }
+
+                // Let's start the data item sync to the watch
+                PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/soundtitles");
+                putDataMapReq.getDataMap().putString("sound1Txt",
+                        settings.getString("sound1Txt","Sound 1"));
+                putDataMapReq.getDataMap().putString("sound2Txt",
+                        settings.getString("sound2Txt","Sound 2"));
+                putDataMapReq.getDataMap().putString("sound3Txt",
+                        settings.getString("sound3Txt","Sound 3"));
+                PutDataRequest putDataReq = putDataMapReq.asPutDataRequest().setUrgent();
+                Log.d(TAG, "Attempting to write to data layer...");
+                PendingResult<DataApi.DataItemResult> pendingResult =
+                        Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
+
 
             }
             else Log.d(TAG, "Result data null!");
@@ -208,6 +246,9 @@ public class MainActivity extends AppCompatActivity {
         mSound1Button = (ImageButton) findViewById(R.id.sound1_img);
         mSound2Button = (ImageButton) findViewById(R.id.sound2_img);
         mSound3Button = (ImageButton) findViewById(R.id.sound3_img);
+
+        // Bottom connection info text
+        mConnectionText = (TextView) findViewById(R.id.connectionText);
 
         // Setting up listeners on buttons so they play
         mSound1Button.setOnClickListener(new View.OnClickListener() {

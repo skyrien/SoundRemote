@@ -7,4 +7,7 @@
     <string name="sound1_path">android.resource://com.skyrien.soundremote/raw/sample1</string>
     <string name="sound2_path">android.resource://com.skyrien.soundremote/raw/sample2</string>
     <string name="sound3_path">android.resource://com.skyrien.soundremote/raw/sample3</string>
+    <string name="top_txt">Pick three notification sounds to play with your SoundRemote!</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-8600275837934879/3791008343</string>
 </resources>

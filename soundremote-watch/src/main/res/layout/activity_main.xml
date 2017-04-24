@@ -10,22 +10,19 @@
     tools:context="com.skyrien.soundremote.MainActivity"
     tools:deviceIds="wear">
 
+    <TextClock
+        android:id="@+id/textClock1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"/>
+
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     app:layout_box="left|top|right">
 
-
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/titleText"
-        android:textStyle="bold"
-        android:padding="1dp"
-        android:gravity="left"
-        app:layout_box="all" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,6 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/sound1_txt"
+            android:textSize="20sp"
             android:padding="5dp"
             app:layout_box="all" />
 
@@ -67,6 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/sound2_txt"
+            android:textSize="20sp"
             android:padding="5dp"
             app:layout_box="all" />
 
@@ -90,6 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/sound3_txt"
+            android:textSize="20sp"
             android:padding="5dp"
             app:layout_box="all" />
 
@@ -97,6 +97,7 @@
     </LinearLayout>
 
 </LinearLayout>
+
 
 
 

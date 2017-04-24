@@ -5,9 +5,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
+import android.support.wearable.view.ConfirmationOverlay;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,13 +18,22 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.Set;
 
-public class MainActivity extends WearableActivity {
+public class MainActivity extends WearableActivity implements
+        DataApi.DataListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     // SECTION 1:
     // THIS SECTION DEALS WITH ACTIVITY SETUP
@@ -38,7 +49,7 @@ public class MainActivity extends WearableActivity {
     private TextView mText1;
     private TextView mText2;
     private TextView mText3;
-    private TextView mTitleText;
+    private TextClock mTextClock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +101,37 @@ public class MainActivity extends WearableActivity {
 
     // SECTION 3:
     // BOILERPLATE FOR WEAR
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "onConnected() called");
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.d(TAG, "onConnectionSuspended() called");
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.d(TAG, "onConnectionFailed() called");
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Wearable.DataApi.removeListener(mGoogleApiClient, this);
+        mGoogleApiClient.disconnect();
+    }
+
 
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
@@ -115,12 +157,14 @@ public class MainActivity extends WearableActivity {
             mText1.setTextColor(getResources().getColor(android.R.color.white));
             mText2.setTextColor(getResources().getColor(android.R.color.white));
             mText3.setTextColor(getResources().getColor(android.R.color.white));
+            mTextClock.setTextColor(getResources().getColor(android.R.color.white));
 
         } else {
             mContainerView.setBackground(null);
             mText1.setTextColor(getResources().getColor(android.R.color.black));
             mText2.setTextColor(getResources().getColor(android.R.color.black));
             mText3.setTextColor(getResources().getColor(android.R.color.black));
+            mTextClock.setTextColor(getResources().getColor(android.R.color.black));
         }
     }
 
@@ -140,6 +184,7 @@ public class MainActivity extends WearableActivity {
                         // I should probably add an event here to detect capabilities
 
                         setupSoundremoteplayer();
+
 
                     }
 
@@ -214,12 +259,6 @@ public class MainActivity extends WearableActivity {
     }
 
 
-
-
-
-
-
-
     private void initUiFields() {
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
@@ -229,7 +268,7 @@ public class MainActivity extends WearableActivity {
         mText1 = (TextView) findViewById(R.id.sound1_txt);
         mText2 = (TextView) findViewById(R.id.sound2_txt);
         mText3 = (TextView) findViewById(R.id.sound3_txt);
-        mTitleText = (TextView) findViewById(R.id.titleText);
+        mTextClock = (TextClock) findViewById(R.id.textClock1);
 
         // Set up listeners for buttons
         mImageButton1.setOnClickListener(new View.OnClickListener() {
@@ -260,18 +299,32 @@ public class MainActivity extends WearableActivity {
         });
     }
 
-    // Was originally gonna use this helper function to send messages, but embedded the logic in
-    // playRemoteSound() instead.
-    /*
-    private void sendMessage(final String path, final String text) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+    @Override
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        Log.d(TAG, "onDataChanged() called");
+        for (DataEvent event : dataEvents) {
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
+                // DataItem changed
+                DataItem item = event.getDataItem();
+                if (item.getUri().getPath().compareTo("/soundtitles") == 0) {
+                    DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                    String sound1Txt, sound2Txt, sound3Txt;
+                    sound1Txt = dataMap.getString("sound1Txt");
+                    sound2Txt = dataMap.getString("sound2Txt");
+                    sound3Txt = dataMap.getString("sound3Txt");
 
+                    Log.d(TAG, "DataItem strings: 1: " + sound1Txt + "; 2: " + sound2Txt + "; 3: " + sound3Txt);
+
+                    // setting strings
+                    mText1.setText(sound1Txt);
+                    mText2.setText(sound2Txt);
+                    mText3.setText(sound3Txt);
+                }
             }
-        });
+        }
     }
-    */
+
+
 
 
 }
