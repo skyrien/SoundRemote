@@ -1,0 +1,50 @@
+{
+  "project_info": {
+    "project_number": "775321751974",
+    "firebase_url": "https://soundremote-dd007.firebaseio.com",
+    "project_id": "soundremote-dd007",
+    "storage_bucket": "soundremote-dd007.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:775321751974:android:af363a1d97f1e637",
+        "android_client_info": {
+          "package_name": "com.skyrien.soundremote"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "775321751974-0vl2jtiushvsl1dnovsu4b2ddu846kt9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.skyrien.soundremote",
+            "certificate_hash": "2ba2e6d7f38d6fd2a527f9b63e4ad624c861001a"
+          }
+        },
+        {
+          "client_id": "775321751974-t89616994tcvpq6k007lup16vkqvffd4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZik5Cq12L0Xm_ZoD_7EWQ3YklMjkc9FE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

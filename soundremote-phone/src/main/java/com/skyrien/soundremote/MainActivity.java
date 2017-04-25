@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Let's load ads last
-        MobileAds.initialize(getApplicationContext(), getString(R.string.banner_ad_unit_id));
+        MobileAds.initialize(getApplicationContext(), getString(R.string.admob_appId));
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);

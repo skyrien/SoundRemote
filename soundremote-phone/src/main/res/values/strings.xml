@@ -8,6 +8,6 @@
     <string name="sound2_path">Select Sound 2...</string>
     <string name="sound3_path">Select Sound 3...</string>
     <string name="top_txt">Pick three notification sounds to play with your SoundRemote!</string>
-
+    <string name="admob_appId">ca-app-pub-8600275837934879~2314275141</string>
     <string name="banner_ad_unit_id">ca-app-pub-8600275837934879/3791008343</string>
 </resources>
