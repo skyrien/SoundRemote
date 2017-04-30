@@ -1,9 +1,84 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.skyrien.soundremote.aboutActivity">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-</android.support.constraint.ConstraintLayout>
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context="com.skyrien.lifeindays.AboutActivity">
+
+        <TextView android:text="@string/app_name" android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textviewAppName"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView android:text="@string/textview_author" android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textviewAuthor"
+            android:layout_below="@+id/textviewAppName"
+            android:textAppearance="@style/TextAppearance.AppCompat" />
+
+        <TextView android:text="@string/textviewVersion" android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textviewVersion"
+            android:layout_below="@+id/textviewAuthor"
+            android:textAppearance="@style/TextAppearance.AppCompat" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:text="0.0"
+            android:id="@+id/textviewVersionNumber"
+            android:layout_alignTop="@+id/textviewVersion"
+            android:layout_toRightOf="@+id/textviewVersion"
+            android:layout_toEndOf="@+id/textviewVersion"
+            android:layout_marginLeft="8dp"
+            />
+
+        <TextView android:text="@string/textviewDescription" android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textviewDescription"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:layout_below="@+id/textviewVersion"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/textviewReleaseNotesTitle"
+            android:id="@+id/textviewReleaseNotesTitle"
+            android:layout_below="@+id/textviewDescription"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/textviewReleaseNotesText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:text="@string/textviewReleaseNotesText"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/textviewReleaseNotesTitle"
+            />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:id="@+id/imageViewIcon"
+            android:src="@mipmap/ic_launcher"
+            android:layout_above="@+id/textviewDescription"
+            android:layout_alignRight="@+id/textviewDescription"
+            android:layout_alignEnd="@+id/textviewDescription" />
+
+
+    </RelativeLayout>
+
+</ScrollView>

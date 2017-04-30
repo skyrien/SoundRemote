@@ -1,13 +1,36 @@
 <resources>
     <string name="app_name">SoundRemote</string>
+    <string name="title_text">Title</string>
+    <string name="action_about">About...</string>
+
     <string name="sound1_txt">Sound 1</string>
     <string name="sound2_txt">Sound 2</string>
     <string name="sound3_txt">Sound 3</string>
-    <string name="title_text">Title</string>
+
     <string name="sound1_path">Select Sound 1...</string>
     <string name="sound2_path">Select Sound 2...</string>
     <string name="sound3_path">Select Sound 3...</string>
+
     <string name="top_txt">Pick three notification sounds to play with your SoundRemote!</string>
+    <string name="connectionText">SoundRemote is designed to be used with an Android Wear smartwatch.</string>
+
+    <string name="about_app_name">About</string>
+    <string name="textview_author">skyrien</string>
+    <string name="textviewVersion">Version</string>
+    <string name="textviewDescription">SoundRemote is a simple app that play sounds on your phone using your Android Wear smartwatch.
+        \n\nI first created this app to prank my cat with meowing sounds. I\'m sure there are plenty of other creative uses. \n\nHave fun!</string>
+    <string name="textviewReleaseNotesTitle">Version Roadmap</string>
+    <string name="textviewReleaseNotesText">
+        Version 0.1 - May 2017\n
+        - First release of SoundRemote\n
+        - Three sounds supported; one-way comms (watch to phone)\n
+        \n
+        Version 0.2 (next)\n
+        - Sync sound names to watch
+
+    \n\nThanks to Google for providing Android System Icons under
+    CC-BY. Some icons were used, others modified, for the icons used in this app.</string>
+
     <string name="admob_appId">ca-app-pub-8600275837934879~2314275141</string>
     <string name="banner_ad_unit_id">ca-app-pub-8600275837934879/3791008343</string>
 </resources>

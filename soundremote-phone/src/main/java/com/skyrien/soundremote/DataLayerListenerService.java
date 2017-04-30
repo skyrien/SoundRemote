@@ -34,7 +34,7 @@ public class DataLayerListenerService extends WearableListenerService
     private static final String TAG = "DATALAYERLISTENER";
     private static final String SETTINGS = "SoundRemote";
     String RESOURCE_PATH = ContentResolver.SCHEME_ANDROID_RESOURCE + "://";
-    String path = RESOURCE_PATH + getPackageName() + "/";
+    String path = RESOURCE_PATH; // + getPackageName() + "/";
 
 
     // Setup App References here

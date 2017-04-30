@@ -18,6 +18,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -96,13 +99,30 @@ public class MainActivity extends AppCompatActivity {
         // Setting hardware volume controls for music streaming control
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-
         // Let's load ads last
         MobileAds.initialize(getApplicationContext(), getString(R.string.admob_appId));
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // There's only one item in the option menu so let's just launch it!
+        Intent intent = new Intent(this,AboutActivity.class);
+        startActivity(intent);
+        return true;
+    }
+
 
     // loadFilePicker() provides a pickable index
     public void loadFilePicker(int requestCode) {
