@@ -94,7 +94,7 @@ public class MainActivity extends WearableActivity implements
             );
         }
         else { // no player found
-            Toast.makeText(MainActivity.this, "No player found!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "No player found!\nTry relaunching SoundRemote on your phone", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "BOO! No SoundRemotePlayer found.");
         }
     }

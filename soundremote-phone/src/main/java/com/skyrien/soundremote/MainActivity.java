@@ -1,12 +1,15 @@
 package com.skyrien.soundremote;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -67,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate() called");
 
         // Initialize stuff
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.argb(255,211,16,4))); // set your desired color
         initUiFields();
         initGoogleApiClient();
 
@@ -125,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // loadFilePicker() provides a pickable index
+    // currently set up to load a RingtoneManager for the notification types
     public void loadFilePicker(int requestCode) {
         Log.d(TAG,"loadFilePicker() called");
 
@@ -141,10 +147,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"Moving on...");
     }
 
-
+    // onActivityResult--
     // This is the activity result for the ringtone picker... i think?
-    // Here's what we need to do -- we need to take the new file, update the local SharedPreferences, and reload
-    // the new files in the data listener
+    // Here's what we need to do -- we need to take the new file, update the local SharedPreferences,
+    // and reload the new files in the data listener
     // Note: The requestCode basically is which individual sound was picked (1, 2, or 3).
     // The resultCode is the response from the Activity
 
@@ -215,6 +221,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
 
+                // THE FOLLOWING LOGIC IS SUPPOSED TO SYNC THE FILENAMES WITH THE WATCH VIA THE
+                // DATALAYER. HOWEVER, IT DOESN'T SEEM TO WORK...
+
                 // Let's start the data item sync to the watch
                 PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/soundtitles");
                 putDataMapReq.getDataMap().putString("sound1Txt",
@@ -234,8 +243,9 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-    }//onActivityResult
+    }
 
+    // The following is supposed to check if the service is running, else return false
     // borrowed from
     // http://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -343,7 +353,6 @@ public class MainActivity extends AppCompatActivity {
 
     // SECTION 4:
     // SUPPORT UTILITY FUNCTIONS
-    //
 
     private void initGoogleApiClient() {
         Log.d(TAG, "Called initGoogleApiClient()");
@@ -377,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
     public void setupSoundremoteplayer() {
         Log.d(TAG, "setupSoundremotePlayer() called");
 
-        // Bypasses lots of note searching since we already know we only need the local node
+        // Bypasses lots of node searching since we already know we only need the local node
         Wearable.NodeApi.getLocalNode(mGoogleApiClient).setResultCallback(
                 new ResultCallback<NodeApi.GetLocalNodeResult>() {
                     @Override
@@ -389,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-// SECTION 2:
+// SECTION 5:
     // THIS IS ACTIVITY LOGIC
     //
 

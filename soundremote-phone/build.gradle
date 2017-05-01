@@ -33,6 +33,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-wearable:10.2.1'
     compile 'com.google.firebase:firebase-ads:10.2.1'
     compile 'com.android.support.constraint:constraint-layout:+'
+    compile 'com.android.support:support-compat:25.1.0'
+    wearApp project(':soundremote-watch')
     testCompile 'junit:junit:4.12'
 }
 

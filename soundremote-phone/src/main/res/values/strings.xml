@@ -15,9 +15,10 @@
     <string name="connectionText">SoundRemote is designed to be used with an Android Wear smartwatch.</string>
 
     <string name="about_app_name">About</string>
-    <string name="textview_author">skyrien</string>
+    <string name="textview_author">Copyright \u00A9 2017 by skyrien</string>
     <string name="textviewVersion">Version</string>
-    <string name="textviewDescription">SoundRemote is a simple app that play sounds on your phone using your Android Wear smartwatch.
+    <string name="textviewDescription">
+        SoundRemote let\'s you play sounds on your phone using your Android Wear smartwatch. To use a sound, place it in your Notifications folder.
         \n\nI first created this app to prank my cat with meowing sounds. I\'m sure there are plenty of other creative uses. \n\nHave fun!</string>
     <string name="textviewReleaseNotesTitle">Version Roadmap</string>
     <string name="textviewReleaseNotesText">

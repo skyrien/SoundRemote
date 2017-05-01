@@ -2,6 +2,8 @@ package com.skyrien.soundremote;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,6 +23,7 @@ public class AboutActivity extends AppCompatActivity {
 
         setTitle(R.string.about_app_name);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.argb(255,211,16,4))); // set your desired color
         actionBar.setIcon(R.drawable.ic_about);
         actionBar.setDisplayHomeAsUpEnabled(true);
 

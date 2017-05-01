@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SOUND REMOTE</string>
+    <string name="app_name">SoundRemote</string>
     <string name="hello_world">Hello World!</string>
     <string name="sound1_txt">Sound 1</string>
     <string name="sound2_txt">Sound 2</string>
